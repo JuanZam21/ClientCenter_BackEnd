@@ -2,9 +2,15 @@ import os
 import traceback
 import sys
 import psycopg2
+import uuid
+
+
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath("__file__")), "solucion-victoria"))
 import config
+import random
+
+
 
 # Se definen los parámetros de conexión a la BD con base en el ambiente (Dev/Prod)
 def init_db():
@@ -26,54 +32,90 @@ def init_db():
         cur = conn.cursor()
 
         # Se borran las tablas usuario, conversacion y agente
-        cur.execute("DROP TABLE IF EXISTS usuario CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS agente CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS documento CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS conversacion CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS Clientes CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS Transacciones CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS Saldos CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS Informacion_Adicional CASCADE;")
 
-        # Se crean las tablas con sus respectivos campos
-        cur.execute("CREATE TABLE usuario (id_usuario uuid DEFAULT gen_random_uuid () PRIMARY KEY,"
-                    "nombre_usuario varchar (100) NOT NULL,"
-                    "correo_usuario varchar (100) NOT NULL,"
-                    "hash_auth_usuario varchar (100) NOT NULL,"
-                    "agentes_permitidos varchar (100) [],"
-                    "fecha_usuario date DEFAULT CURRENT_TIMESTAMP);")
-        
-        cur.execute("CREATE TABLE agente (id_agente uuid DEFAULT gen_random_uuid () PRIMARY KEY,"
-                    "nombre_agente varchar (100) NOT NULL,"
-                    "configuracion text,"
-                    "tipo varchar (100) NOT NULL,"
-                    "fecha_agente date DEFAULT CURRENT_TIMESTAMP);")
-        
-        cur.execute("CREATE TABLE documento (id_documento uuid DEFAULT gen_random_uuid () PRIMARY KEY,"
-                    "nombre_documento varchar (100) NOT NULL,"
-                    "archivo json [],"
-                    "fecha_carga date DEFAULT CURRENT_TIMESTAMP);")
+        cur.execute("CREATE TABLE Clientes (id INT PRIMARY KEY ,"
+                    "nombre varchar (100) NOT NULL,"
+                    "correo varchar (100) NOT NULL,"
+                    "direccion varchar (100) NOT NULL,"
+                    "telefono varchar (100) NOT NULL,"
+                    "fecha date DEFAULT CURRENT_TIMESTAMP);")
 
-        cur.execute("CREATE TABLE conversacion (id_conversacion uuid DEFAULT gen_random_uuid () PRIMARY KEY,"
-                    "id_usuario uuid NOT NULL,"
-                    "id_agente uuid NOT NULL,"
-                    "id_documento uuid,"
-                    "nombre_conversacion varchar (100) NOT NULL,"
-                    "historico_conversacion text NOT NULL,"
-                    "tags varchar (100) [],"
-                    "fecha_conversacion date DEFAULT CURRENT_TIMESTAMP,"
-                    "CONSTRAINT fk_usuario FOREIGN KEY(id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,"
-                    "CONSTRAINT fk_agente FOREIGN KEY(id_agente) REFERENCES agente(id_agente) ON DELETE CASCADE,"
-                    "CONSTRAINT fk_documento FOREIGN KEY(id_documento) REFERENCES documento(id_documento) ON DELETE CASCADE);")
+        cur.execute("CREATE TABLE Transacciones (id uuid PRIMARY KEY,"
+                    "cliente_id INT NOT NULL,"
+                    "tipo_transaccion varchar (50),"
+                    "monto varchar (100) NOT NULL,"
+                    "fecha date DEFAULT CURRENT_TIMESTAMP,"
+                    "FOREIGN KEY (cliente_id) REFERENCES Clientes(id));")
+
+        cur.execute("CREATE TABLE Saldos (id uuid PRIMARY KEY,"
+                    "cliente_id INT,"
+                    "tipo_cuenta VARCHAR(100),"
+                    "saldo DECIMAL(10, 2),"
+                    "fecha_actualizacion TIMESTAMP,"
+                    "FOREIGN KEY (cliente_id) REFERENCES Clientes(id));")
+
+        cur.execute("CREATE TABLE Informacion_Adicional ("
+                "id uuid PRIMARY KEY,"
+                "cliente_id INT,"
+                "categoria VARCHAR(50),"
+                "detalle TEXT,"
+                "FOREIGN KEY (cliente_id) REFERENCES Clientes(id));")
         
-        # Se añaden los agentes actualmente desarrollados
-        cur.execute("INSERT INTO agente (nombre_agente, configuracion, tipo) VALUES ('Agente Pruebas',"
-                    "'Descripción del proposito y configuración del agente de pruebas para mostrar en el portal web de VictorIA.',"
-                    "'General');")
-        
-        cur.execute("INSERT INTO agente (nombre_agente, configuracion, tipo) VALUES ('Agente Azure',"
-                    "'Un asesor de ventas que orienta al cliente sobre características y precios de máquinas virtuales de Azure según sus necesidades.',"
-                    "'General');")
-        
-        cur.execute("INSERT INTO agente (nombre_agente, configuracion, tipo) VALUES ('Agente Licitaciones',"
-                    "'Un asistente legal que ayuda a los usuarios a estudiar, analizar y resumir documentos de procesos licitatorios para encontrar infromación relevante y responder preguntas sobre estos.',"
-                    "'RAG');")
+        # Insertar datos en la tabla Clientes
+        cur.execute("INSERT INTO Clientes (id, nombre, correo, direccion, telefono, fecha) VALUES "
+            "(1007677635, 'Juan', 'juan.zambrano@gamil.com', 'Calle 123, Calle 3 - Garzon', '1234567890', CURRENT_TIMESTAMP),"
+            "(55059733, 'María', 'maria.gonzalez@example.com', 'Av. Principal, Calle 3 - Neiva', '0987654321', CURRENT_TIMESTAMP),"
+            "(12189436, 'Pedro', 'pedro.diaz@example.com', 'Carrera 456, Carrera 1 Cali', '9876543210', CURRENT_TIMESTAMP),"
+            "(1007677652, 'Laura', 'laura.lopez@example.com', 'Calle Principal, Calle 10 Bogotá', '5678901234', CURRENT_TIMESTAMP),"
+            "(134029340, 'Carlos', 'carlos.martinez@example.com', 'Av. Central, Calle 1 Medellin', '2345678901', CURRENT_TIMESTAMP),"
+            "(123456789, 'Ana', 'ana.rodriguez@example.com', 'Calle 456, Calle 2 - Barranquilla', '3456789012', CURRENT_TIMESTAMP),"
+            "(987654321, 'Luis', 'luis.gomez@example.com', 'Av. Norte, Calle 5 - Cartagena', '4567890123', CURRENT_TIMESTAMP),"
+            "(567890123, 'Sofía', 'sofia.hernandez@example.com', 'Carrera 789, Carrera 2 - Pereira', '5678901234', CURRENT_TIMESTAMP),"
+            "(234567890, 'Miguel', 'miguel.perez@example.com', 'Calle Sur, Calle 4 - Bucaramanga', '6789012345', CURRENT_TIMESTAMP),"
+            "(345678901, 'Isabella', 'isabella.lopez@example.com', 'Av. Oeste, Calle 6 - Santa Marta', '7890123456', CURRENT_TIMESTAMP);")
+
+        # Insertar datos en la tabla Transacciones
+        cur.execute("INSERT INTO Transacciones (id, cliente_id, tipo_transaccion, monto, fecha) VALUES "
+            f"('{str(uuid.uuid4())}', 1007677635, 'Depósito', 1000.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 55059733, 'Retiro', -500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 12189436, 'Depósito', 1500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 1007677652, 'Transferencia', -200.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 134029340, 'Depósito', 800.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 123456789, 'Retiro', -300.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 987654321, 'Depósito', 500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 567890123, 'Transferencia', -100.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 234567890, 'Depósito', 1200.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 345678901, 'Retiro', -700.00, CURRENT_TIMESTAMP);")
+
+        # Insertar datos en la tabla Saldos
+        cur.execute("INSERT INTO Saldos (id, cliente_id, tipo_cuenta, saldo, fecha_actualizacion) VALUES "
+            f"('{str(uuid.uuid4())}', 1007677635, 'Ahorros', 2000.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 55059733, 'Corriente', 3000.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 12189436, 'Ahorros', 2500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 1007677652, 'Corriente', 1200.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 134029340, 'Ahorros', 500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 123456789, 'Corriente', 4000.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 987654321, 'Ahorros', 1500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 567890123, 'Corriente', 6000.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 234567890, 'Ahorros', 3500.00, CURRENT_TIMESTAMP),"
+            f"('{str(uuid.uuid4())}', 345678901, 'Corriente', 8000.00, CURRENT_TIMESTAMP);")
+
+        # Insertar datos en la tabla Informacion_Adicional (opcional)
+        cur.execute("INSERT INTO Informacion_Adicional (id, cliente_id, categoria, detalle) VALUES "
+            f"('{str(uuid.uuid4())}', 1007677635, 'Notas', 'Cliente con buena historia crediticia.'),"
+            f"('{str(uuid.uuid4())}', 55059733, 'Notas', 'Cliente nuevo en el banco.'),"
+            f"('{str(uuid.uuid4())}', 12189436, 'Notas', 'Cliente frecuente en el banco.'),"
+            f"('{str(uuid.uuid4())}', 1007677652, 'Notas', 'Cliente con varios productos en el banco.'),"
+            f"('{str(uuid.uuid4())}', 134029340, 'Notas', 'Cliente con saldo negativo en su cuenta.'),"
+            f"('{str(uuid.uuid4())}', 123456789, 'Notas', 'Cliente con transacciones sospechosas.'),"
+            f"('{str(uuid.uuid4())}', 987654321, 'Notas', 'Cliente con historial de pagos a tiempo.'),"
+            f"('{str(uuid.uuid4())}', 567890123, 'Notas', 'Cliente con alta rotación de fondos.'),"
+            f"('{str(uuid.uuid4())}', 234567890, 'Notas', 'Cliente con préstamo vigente.'),"
+            f"('{str(uuid.uuid4())}', 345678901, 'Notas', 'Cliente con cuenta inactiva.');")
         
         conn.commit()
         cur.close()
