@@ -2,7 +2,6 @@ import os
 from . import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 
 # Inicializa SQLAlchemy para todo el proyecto
 db = SQLAlchemy()

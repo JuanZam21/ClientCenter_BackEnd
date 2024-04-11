@@ -4,11 +4,9 @@ import datetime
 import uuid
 from . import db
 
-
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import ForeignKey, CheckConstraint
 import uuid
-
 
 class Clientes(db.Model):
     __tablename__ = 'clientes'

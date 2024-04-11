@@ -4,13 +4,9 @@ import sys
 import psycopg2
 import uuid
 
-
-
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath("__file__")), "solucion-victoria"))
 import config
 import random
-
-
 
 # Se definen los parámetros de conexión a la BD con base en el ambiente (Dev/Prod)
 def init_db():

@@ -1,0 +1,7 @@
+flask==3.0.1
+flask-cors==3.0.10
+flask-sqlalchemy==3.1.1
+requests
+psycopg2
+python-dotenv
+sqlalchemy==2.0.25   
