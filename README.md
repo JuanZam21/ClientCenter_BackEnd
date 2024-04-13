@@ -9,7 +9,3 @@ Bienvenido a ClientCenter, una solución centralizada para acceder rápidamente 
 - **Búsqueda y Filtrado Avanzado:** Busca y filtra los datos del cliente por diferentes criterios para encontrar la información relevante de manera rápida.
 - **Actualización Segura de Información:** Actualiza la información del cliente de manera segura, con registros precisos de los cambios realizados.
 - **Seguridad y Cumplimiento:** Implementa medidas de seguridad robustas para proteger la información confidencial del cliente y cumplir con regulaciones de privacidad.
-
-## Instalación
- 
- 
