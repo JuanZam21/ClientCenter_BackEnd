@@ -2,12 +2,16 @@ import os
 from . import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
+from flask_cors import CORS
 
 # Inicializa SQLAlchemy para todo el proyecto
 db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
+    swagger = Swagger(app)
 
     # Se determina el ambiente (Dev/Prod) y se cargan las variables de entorno
     if 'DBNAME_DEV' not in os.environ:
@@ -40,4 +44,16 @@ def create_app():
     # Se inicializa la aplicación
     db.init_app(app)
 
- 
+    # Blueprint para clients
+    from .modules.clients_bp import clients_bp as clients_blueprint
+    app.register_blueprint(clients_blueprint, url_prefix='/api/auth/')
+
+    # Blueprint para analitics 
+    from .modules.credit_bp import credit_bp as credit_blueprint
+    app.register_blueprint(credit_blueprint)
+
+    # Blueprint para offices
+    from .modules.offices_bp import offices_bp as offices_blueprint
+    app.register_blueprint(offices_blueprint, url_prefix='/api')
+
+    return app

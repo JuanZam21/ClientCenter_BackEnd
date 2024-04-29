@@ -13,8 +13,6 @@ class Config(object):
 # Se cargan las variables de entorno alojadas de forma local en archivo .env
 # El acceso al Data Warehouse de Impresistem se debe hacer únicamente desde el ambiente de producción
 class DevelopmentConfig(Config):
-    OPENAI_KEY = os.getenv('OPENAI_KEY')
-    OPENAI_VERSION = os.getenv('OPENAI_VERSION')
 
     DBNAME = os.getenv('DBNAME_DEV')
     DBHOST = os.getenv('DBHOST_DEV')
@@ -23,6 +21,7 @@ class DevelopmentConfig(Config):
     DBPASS = os.getenv('DBPASS_DEV')
 
     SECRET_KEY = os.getenv('SECRET_KEY')
+
 
 # Para el ambiente de producción
 # Se cargan las variables de entorno configuradas en Azure Web Services
