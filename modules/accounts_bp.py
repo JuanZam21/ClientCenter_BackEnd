@@ -8,6 +8,69 @@ from ..models import User, Accounts, Account_type
 
 accounts_bp = Blueprint('accounts_bp', __name__)
 
+# Consulta de preguntas cuentas
+@accounts_bp.route('/api/cuenta/questions')
+@swag_from({
+    'description': 'Devuelve preguntas estándar para obtener información detallada de las cuentas',
+    'tags': ['Cuentas'],
+    'responses': {
+        '200': {
+            'description': 'Preguntas encontradas exitosamente',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'success': {'type': 'boolean'},
+                            'message': {'type': 'string'},
+                            'data': {
+                                'type': 'array',
+                                'items': {
+                                    'type': 'object',
+                                    'properties': {
+                                        'label': {'type': 'string'},
+                                        'name': {'type': 'string'}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
+def questions():
+    return jsonify(
+     {
+  "data": [
+    {
+      "label": "Saldo actual",
+      "name": "saldoActual"
+    },
+    {
+      "label": "Fecha de apertura",
+      "name": "fechaApertura"
+    },
+    {
+      "label": "Fecha de cierre",
+      "name": "fechaCierre"
+    },
+    {
+      "label": "Beneficios",
+      "name": "beneficios"
+    },
+    {
+      "label": "Estado",
+      "name": "estado"
+    }
+  ],
+  "success": True,
+  "message": "Preguntas encontradas"
+},
+
+    ),200
+
 # Consulta de cuentas por id de persona
 @accounts_bp.route('/api/cuenta', methods=['POST'])
 @swag_from({
@@ -92,7 +155,6 @@ accounts_bp = Blueprint('accounts_bp', __name__)
         }
     }
 })
-
 def cuenta():
     data = request.get_json()
     id_cliente = data.get('idCliente')
@@ -157,66 +219,3 @@ def cuenta():
         account_dict['data']['estado_cuenta'] = accounts.estado_cuenta
     
     return jsonify(account_dict), 200
-
-
-@accounts_bp.route('/api/cuenta/questions')
-@swag_from({
-    'description': 'Devuelve preguntas estándar para obtener información detallada de las cuentas',
-    'tags': ['Cuentas'],
-    'responses': {
-        '200': {
-            'description': 'Preguntas encontradas exitosamente',
-            'content': {
-                'application/json': {
-                    'schema': {
-                        'type': 'object',
-                        'properties': {
-                            'success': {'type': 'boolean'},
-                            'message': {'type': 'string'},
-                            'data': {
-                                'type': 'array',
-                                'items': {
-                                    'type': 'object',
-                                    'properties': {
-                                        'label': {'type': 'string'},
-                                        'name': {'type': 'string'}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-})
-def questions():
-    return jsonify(
-     {
-  "data": [
-    {
-      "label": "Saldo actual",
-      "name": "saldoActual"
-    },
-    {
-      "label": "Fecha de apertura",
-      "name": "fechaApertura"
-    },
-    {
-      "label": "Fecha de cierre",
-      "name": "fechaCierre"
-    },
-    {
-      "label": "Beneficios",
-      "name": "beneficios"
-    },
-    {
-      "label": "Estado",
-      "name": "estado"
-    }
-  ],
-  "success": True,
-  "message": "Preguntas encontradas"
-},
-
-    ),200

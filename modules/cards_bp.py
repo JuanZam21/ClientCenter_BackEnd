@@ -85,6 +85,7 @@ def question():
   "message": "Preguntas encontradas"
 }),200
 
+# Consulta de tarjeta por id de persona 
 @cards_bp.route('/api/tarjeta', methods=['POST'])
 @swag_from({
     'description': 'Crea o actualiza la información de la tarjeta de crédito de un cliente basado en su ID',

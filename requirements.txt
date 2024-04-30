@@ -4,5 +4,5 @@ flask-sqlalchemy==3.1.1
 requests
 psycopg2
 python-dotenv
-sqlalchemy==2.0.25  
+sqlalchemy==2.0.25
 flasgger==0.9.7.1

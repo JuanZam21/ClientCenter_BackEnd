@@ -8,7 +8,7 @@ from ..models import Credit, User
 
 credits_bp = Blueprint('credits_bp', __name__)
 
-# Consulta de sucursales por id sucursal
+# Consulta de las preguntas de creditos
 @credits_bp.route('/api/credito/questions')
 @swag_from({
     'tags': ['Creditos'],
@@ -38,7 +38,6 @@ credits_bp = Blueprint('credits_bp', __name__)
         }
     }
 })
-
 def questions():
     
     return jsonify(
@@ -74,7 +73,7 @@ def questions():
 },
     ), 200
 
-
+# Consulta de creditos por id de persona
 @credits_bp.route('/api/credito', methods=['POST'])
 @swag_from({
     'description': 'Consulta los creditos de una persona por su id',
@@ -159,7 +158,6 @@ def questions():
         }
     }
 })
-# Consulta de creditos por id de persona
 def creditos_persona():
     data = request.get_json()
     id_cliente = data.get('idCliente')

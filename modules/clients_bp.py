@@ -7,7 +7,7 @@ from ..models import User
 
 clients_bp = Blueprint('clients_bp', __name__)
 
-# Consulta ID
+# Consulta clientes por ID
 @clients_bp.route('/client/<id>')
 @swag_from({
     'tags': ['Clientes'],  
@@ -105,5 +105,3 @@ def client(id):
         'documento_identidad': user.documento_identidad,
     }
 }), 200
-
-

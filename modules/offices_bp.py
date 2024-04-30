@@ -171,6 +171,5 @@ def sucursal(id):
             'pais': sucursal.pais,
             'direccion': sucursal.direccion,
             'telefono': sucursal.telefono,
-            # Add other fields as needed
         },
     }), 200
