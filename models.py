@@ -5,7 +5,6 @@ import uuid
 from . import db
 from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TEXT
 from sqlalchemy.orm import relationship
-from . import Base
 
 class User(db.Model):
     __tablename__ = 'Persona'
@@ -63,7 +62,7 @@ class Account_type(db.Model):
     name = db.Column(db.String(50))
 
 
-class Tarjetas(Base):
+class Tarjetas(db.Model):
     __tablename__ = 'tarjetas'
 
     id_tarjeta = Column(Integer, primary_key=True)
