@@ -3,6 +3,9 @@ from sqlalchemy.dialects.postgresql import JSON
 import datetime
 import uuid
 from . import db
+from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TEXT
+from sqlalchemy.orm import relationship
+from . import Base
 
 class User(db.Model):
     __tablename__ = 'Persona'
@@ -40,6 +43,50 @@ class Credit(db.Model):
     tipo_credito = db.Column(db.String(50))
     estado_credito = db.Column(db.String(50))
 
+class Accounts(db.Model):
+    __tablename__ = 'Cuentas'
+
+    id_cuenta = db.Column(db.String(50), primary_key=True)
+    id_persona = db.Column(db.String(50), db.ForeignKey('Persona.id'))
+    id_tipo_cuenta = db.Column(db.String(50))
+    saldo_actual = db.Column(db.Numeric(10, 2))
+    moneda = db.Column(db.String(10))
+    fecha_apertura = db.Column(db.Date)
+    fecha_cierre = db.Column(db.Date)
+    estado_cuenta = db.Column(db.String(50))
+    beneficios = db.Column(db.String(200))
+
+class Account_type(db.Model):
+    __tablename__ = 'Tipo_cuenta'
+    
+    id = db.Column(db.String(50), primary_key=True)
+    name = db.Column(db.String(50))
+
+
+class Tarjetas(Base):
+    __tablename__ = 'tarjetas'
+
+    id_tarjeta = Column(Integer, primary_key=True)
+    id_persona = Column(Integer, ForeignKey('clientes.id_cliente'))
+    id_tipo_tarjeta = Column(Integer, ForeignKey('Tipo_tarjeta.id_tipo_tarjeta'))
+    numero_tarjeta = Column(String(16))
+    ultimos_digitos = Column(String(50))
+    nombre_titular = Column(String(50))
+    fecha_emision = Column(Date)
+    fecha_vencimiento = Column(Date)
+    fecha_corte = Column(Date)
+    cupo_total = Column(DECIMAL(10, 2))
+    cupo_disponible = Column(DECIMAL(10, 2))
+    saldo_actual = Column(DECIMAL(10, 2))
+    tasa_interes = Column(DECIMAL(5, 2))
+    estado_tarjeta = Column(String(50))
+    cvv = Column(String(3))
+    pago_minimo = Column(DECIMAL(10, 2))
+    pago_total = Column(DECIMAL(10, 2))
+    pago_anticipado = Column(DECIMAL(10, 2))
+    programa_puntos = Column(String(50))
+    cliente = relationship('Clientes')
+
 """
 class Empleados(Base):
     __tablename__ = 'empleados'
@@ -70,53 +117,8 @@ class Transacciones(Base):
 
 
 
-class Creditos(Base):
-    __tablename__ = 'creditos'
-    id_credito = Column(Integer, primary_key=True)
-    id_cliente = Column(Integer, ForeignKey('clientes.id_cliente'))
-    monto_original = Column(DECIMAL(10, 2))
-    saldo_pendiente = Column(DECIMAL(10, 2))
-    tasa_interes = Column(DECIMAL(5, 2))
-    fecha_inicio = Column(Date)
-    fecha_finalizacion = Column(Date)
-    tipo_credito = Column(String(50))
-    estado_credito = Column(String(50))
-    cliente = relationship('Clientes')
 
-class Cuentas(Base):
-    __tablename__ = 'cuentas'
-    id_cuenta = Column(Integer, primary_key=True)
-    id_cliente = Column(Integer, ForeignKey('clientes.id_cliente'))
-    tipo_cuenta = Column(String(50))
-    saldo_actual = Column(DECIMAL(10, 2))
-    moneda = Column(String(10))
-    fecha_apertura = Column(Date)
-    fecha_cierre = Column(Date)
-    estado_cuenta = Column(String(50))
-    cliente = relationship('Clientes')
 
-class Tarjetas(Base):
-    __tablename__ = 'tarjetas'
-    id_tarjeta = Column(Integer, primary_key=True)
-    id_cliente = Column(Integer, ForeignKey('clientes.id_cliente'))
-    numero_tarjeta = Column(String(16))
-    nombre_titular = Column(String(50))
-    fecha_emision = Column(Date)
-    fecha_vencimiento = Column(Date)
-    fecha_corte = Column(Date)
-    cupo_total = Column(DECIMAL(10, 2))
-    cupo_disponible = Column(DECIMAL(10, 2))
-    saldo_actual = Column(DECIMAL(10, 2))
-    tasa_interes = Column(DECIMAL(5, 2))
-    estado_tarjeta = Column(String(50))
-    cvv = Column(String(3))
-    pago_minimo = Column(DECIMAL(10, 2))
-    pago_total = Column(DECIMAL(10, 2))
-    pago_anticipado = Column(DECIMAL(10, 2))
-    ultimos_movimientos = Column(TEXT)
-    tipo_tarjeta = Column(String(50))
-    programa_puntos = Column(String(50))
-    cliente = relationship('Clientes')
 
 Transacciones.id_cuenta = Column(Integer, ForeignKey('cuentas.id_cuenta'))
 Transacciones.cuenta = relationship('Cuentas')

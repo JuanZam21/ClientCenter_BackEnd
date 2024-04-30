@@ -1,12 +1,5 @@
-
 import json
-import sys
-import tempfile
-import json
-from sqlalchemy import join
-from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
-from collections import defaultdict
 from flask import Blueprint, jsonify, request
 from .. import db
 from flasgger import swag_from

@@ -48,12 +48,25 @@ def create_app():
     from .modules.clients_bp import clients_bp as clients_blueprint
     app.register_blueprint(clients_blueprint, url_prefix='/api/auth/')
 
-    # Blueprint para analitics 
-    from .modules.credit_bp import credit_bp as credit_blueprint
-    app.register_blueprint(credit_blueprint)
+    # Blueprint para credits 
+    from .modules.credits_bp import credits_bp as credits_blueprint
+    app.register_blueprint(credits_blueprint)
+
+    # Blueprint para accounts 
+    from .modules.accounts_bp import accounts_bp as accounts_blueprint
+    app.register_blueprint(accounts_blueprint)
 
     # Blueprint para offices
     from .modules.offices_bp import offices_bp as offices_blueprint
     app.register_blueprint(offices_blueprint, url_prefix='/api')
-
+    
+    # Blueprint para cards
+    from .modules.cards_bp import cards_bp as cards_blueprint
+    app.register_blueprint(cards_blueprint)
+    
+    """
+        # Blueprint para transactions 
+        from .modules.offices_bp import offices_bp as offices_blueprint
+        app.register_blueprint(offices_blueprint, url_prefix='/api')
+"""
     return app

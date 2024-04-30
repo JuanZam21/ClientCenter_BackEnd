@@ -1,4 +1,3 @@
-
 import json
 from sqlalchemy.orm.exc import NoResultFound
 from collections import defaultdict
@@ -7,10 +6,10 @@ from flask import Blueprint, jsonify, request
 from flasgger import swag_from
 from ..models import Credit, User
 
-credit_bp = Blueprint('credit_bp', __name__)
+credits_bp = Blueprint('credits_bp', __name__)
 
 # Consulta de sucursales por id sucursal
-@credit_bp.route('/api/credito/questions')
+@credits_bp.route('/api/credito/questions')
 @swag_from({
     'tags': ['Creditos'],
     'description': 'Consulta las preguntas necesarias relacionadas a los creditos.',   
@@ -76,7 +75,7 @@ def questions():
     ), 200
 
 
-@credit_bp.route('/api/credito', methods=['POST'])
+@credits_bp.route('/api/credito', methods=['POST'])
 @swag_from({
     'description': 'Consulta los creditos de una persona por su id',
     'tags': ['Creditos'],
