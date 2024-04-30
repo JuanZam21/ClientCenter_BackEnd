@@ -4,7 +4,7 @@ from .. import db
 from flask import Blueprint, jsonify, request
 from collections import defaultdict
 from flasgger import swag_from
-from ..models import User, Accounts, Account_type
+from ..models import User, Cards, Card_type
 
 cards_bp = Blueprint('cards_bp', __name__)
 
@@ -64,7 +64,7 @@ def tarjeta():
     fecha_corte = data.get('fechaCorte')
     cupo_total = data.get('cupoTotal')
     tasa_interes = data.get('tasaInteres')
-    estado = data.get('estado')
+    estado_tarjeta = data.get('estado')
     pago_minimo = data.get('pagoMinimo')
     pago_total = data.get('pagoTotal')
     programa_puntos = data.get('programaPuntos')
@@ -83,7 +83,7 @@ def tarjeta():
         user_name = user.nombre
         user_last_name = user.apellido
         # Consulta la tabla Accounts para encontrar todos los datos asociados con el user_id
-        accounts = db.session.query(Accounts).filter(Accounts.id_persona == user_id).all()
+        cards = db.session.query(Cards).filter(Cards.id_persona == user_id).all()
 
     except NoResultFound:
         return jsonify({
@@ -91,36 +91,41 @@ def tarjeta():
             'message': 'No se encontraron creditos para el cliente proporcionado'
         }), 404
     
-    accounts = accounts[0]
-    account_dict = defaultdict()
-    id_account = accounts.id_tipo_cuenta
-    account_type = db.session.query(Account_type).filter(Account_type.id == id_account).first()
+    cards = cards[0]
+    cards_dict = defaultdict()
+    id_account = Cards.id_tipo_tarjeta
+    card_type = db.session.query(Card_type).filter(Card_type.id == id_account).first()
     
 
-    account_dict = {
+    cards_dict = {
         'data': {
-            'id_cuenta': accounts.id_cuenta,
-            'Persona': {
-                'nombre':   user_name,
-                'apellido': user_last_name
-            },
-            'tipo_cuenta': {
-                'name': account_type.name
-            }
+            "nombre_titular": f"{user_name} {user_last_name}",
+            'Tipo_tarjeta': {
+                'name':   card_type.name,
+             },
+            
         },
         'success': True,
-        'message': 'Cuenta encontrada'
+        'message': 'Tarjeta encontrada'
     }
     
-    if saldo_actual:
-        account_dict['data']['saldoActual'] = accounts.saldo_actual
-    if fecha_apertura:
-        account_dict['data']['fechaApertura'] = accounts.fecha_apertura
-    if fecha_cierre:
-        account_dict['data']['fechaCierre'] = accounts.fecha_cierre
-    if beneficios:
-        account_dict['data']['beneficios'] = accounts.beneficios
-    if estado:
-        account_dict['data']['estado'] = accounts.estado_cuenta
+    if fecha_emision:
+        cards_dict['data']['fechaEmision'] = cards.fecha_emision
+    if fecha_vencimiento:
+        cards_dict['data']['fechaVencimiento'] = cards.fecha_vencimiento
+    if fecha_corte:
+        cards_dict['data']['fechaCorte'] = cards.fecha_corte
+    if cupo_total:
+        cards_dict['data']['cupoTotal'] = cards.cupo_total
+    if tasa_interes:
+        cards_dict['data']['tasaInteres'] = cards.tasa_interes
+    if estado_tarjeta:
+        cards_dict['data']['estado'] = cards.estado_tarjeta
+    if pago_minimo:
+        cards_dict['data']['pagoMinimo'] = cards.pago_minimo
+    if pago_total:
+        cards_dict['data']['pagoTotal'] = cards.pago_total
+    if programa_puntos:
+        cards_dict['data']['programaPuntos'] = cards.programa_puntos
     
-    return jsonify(account_dict), 200
+    return jsonify(cards_dict), 200

@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import JSON
 import datetime
 import uuid
 from . import db
-from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TEXT
+from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 
 class User(db.Model):
@@ -62,8 +62,8 @@ class Account_type(db.Model):
     name = db.Column(db.String(50))
 
 
-class Tarjetas(db.Model):
-    __tablename__ = 'tarjetas'
+class Cards(db.Model):
+    __tablename__ = 'Tarjetas'
 
     id_tarjeta = Column(Integer, primary_key=True)
     id_persona = Column(Integer, ForeignKey('clientes.id_cliente'))
@@ -84,7 +84,13 @@ class Tarjetas(db.Model):
     pago_total = Column(DECIMAL(10, 2))
     pago_anticipado = Column(DECIMAL(10, 2))
     programa_puntos = Column(String(50))
-    cliente = relationship('Clientes')
+
+
+class Card_type(db.Model):
+    __tablename__ = 'Tipo_tarjeta'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
 
 """
 class Empleados(Base):
@@ -113,11 +119,6 @@ class Transacciones(Base):
     monto = Column(DECIMAL(10, 2))
     fecha_transaccion = Column(TIMESTAMP)
     descripcion = Column(TEXT)
-
-
-
-
-
 
 Transacciones.id_cuenta = Column(Integer, ForeignKey('cuentas.id_cuenta'))
 Transacciones.cuenta = relationship('Cuentas')
