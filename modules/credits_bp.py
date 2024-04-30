@@ -194,7 +194,7 @@ def creditos_persona():
     
     credito = creditos[0]
     credit_dict = defaultdict()
-    credit_dict['tipo_credito'] = credito.tipo_credito  # Assuming `tipo_credito` is a field in `credito`
+    credit_dict['tipo_credito'] = credito.tipo_credito 
     credit_dict['Persona'] = {
         'nombre':   user_name,
         'apellido': user_last_name

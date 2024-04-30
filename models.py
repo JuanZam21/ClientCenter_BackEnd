@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import JSON
 import datetime
 import uuid
 from . import db
-from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TIMESTAMP, TEXT
 from sqlalchemy.orm import relationship
 
 class User(db.Model):
@@ -66,8 +66,8 @@ class Cards(db.Model):
     __tablename__ = 'Tarjetas'
 
     id_tarjeta = Column(Integer, primary_key=True)
-    id_persona = Column(Integer, ForeignKey('clientes.id_cliente'))
-    id_tipo_tarjeta = Column(Integer, ForeignKey('Tipo_tarjeta.id_tipo_tarjeta'))
+    id_persona = Column(Integer, ForeignKey('persona.id'))
+    id_tipo_tarjeta = Column(Integer, ForeignKey('Tipo_tarjeta.id'))
     numero_tarjeta = Column(String(16))
     ultimos_digitos = Column(String(50))
     nombre_titular = Column(String(50))
@@ -92,6 +92,22 @@ class Card_type(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
 
+class Transactions(db.Model):
+    __tablename__ = 'Transacciones'
+
+    id_transaccion = Column(Integer, primary_key=True)
+    id_persona = Column(Integer, ForeignKey('persona.id'))
+    id_tipo_transaccion = Column(String(50))
+    monto = Column(DECIMAL(10, 2))
+    fecha_transaccion = Column(TIMESTAMP)
+    descripcion = Column(TEXT)
+
+class Transaction_type(db.Model):
+    __tablename__ = 'Tipo_transaccion'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+
 """
 class Empleados(Base):
     __tablename__ = 'empleados'
@@ -111,15 +127,5 @@ class HistorialAtencionCliente(Base):
     cliente = relationship('Clientes')
     empleado = relationship('Empleados')
 
-class Transacciones(Base):
-    __tablename__ = 'transacciones'
-    id_transaccion = Column(Integer, primary_key=True)
-    id_cuenta = Column(Integer)
-    tipo_transaccion = Column(String(50))
-    monto = Column(DECIMAL(10, 2))
-    fecha_transaccion = Column(TIMESTAMP)
-    descripcion = Column(TEXT)
 
-Transacciones.id_cuenta = Column(Integer, ForeignKey('cuentas.id_cuenta'))
-Transacciones.cuenta = relationship('Cuentas')
 """

@@ -63,10 +63,9 @@ def create_app():
     # Blueprint para cards
     from .modules.cards_bp import cards_bp as cards_blueprint
     app.register_blueprint(cards_blueprint)
-    
-    """
-        # Blueprint para transactions 
-        from .modules.offices_bp import offices_bp as offices_blueprint
-        app.register_blueprint(offices_blueprint, url_prefix='/api')
-"""
+
+    # Blueprint para transactions 
+    from .modules.transactions_bp import transactions_bp as transactions_blueprint
+    app.register_blueprint(transactions_blueprint)
+
     return app

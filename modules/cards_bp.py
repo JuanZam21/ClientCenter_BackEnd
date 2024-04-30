@@ -10,6 +10,36 @@ cards_bp = Blueprint('cards_bp', __name__)
 
 # Consulta de preguntas tarjeats
 @cards_bp.route('/api/tarjeta/questions')
+@swag_from({
+    'description': 'Devuelve preguntas estándar para obtener información detallada de las tarjetas de crédito',
+    'tags': ['Tarjetas'],
+    'responses': {
+        '200': {
+            'description': 'Preguntas encontradas exitosamente',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'success': {'type': 'boolean'},
+                            'message': {'type': 'string'},
+                            'data': {
+                                'type': 'array',
+                                'items': {
+                                    'type': 'object',
+                                    'properties': {
+                                        'label': {'type': 'string'},
+                                        'name': {'type': 'string'}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 def question():
     return jsonify(
         {
@@ -56,6 +86,66 @@ def question():
 }),200
 
 @cards_bp.route('/api/tarjeta', methods=['POST'])
+@swag_from({
+    'description': 'Crea o actualiza la información de la tarjeta de crédito de un cliente basado en su ID',
+    'tags': ['Tarjetas'],
+    'consumes': ['application/json'],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'idCliente': {'type': 'string', 'description': 'ID del cliente'},
+                    'fechaEmision': {'type': 'boolean', 'description': 'Fecha de emisión de la tarjeta', 'default': False},
+                    'fechaVencimiento': {'type': 'boolean', 'description': 'Fecha de vencimiento de la tarjeta', 'default': False},
+                    'fechaCorte': {'type': 'boolean', 'description': 'Fecha de corte de la tarjeta', 'default': False},
+                    'cupoTotal': {'type': 'boolean', 'description': 'Cupo total de la tarjeta', 'default': False},
+                    'tasaInteres': {'type': 'boolean', 'description': 'Tasa de interés de la tarjeta', 'default': False},
+                    'estado': {'type': 'boolean', 'description': 'Estado actual de la tarjeta', 'default': False},
+                    'pagoMinimo': {'type': 'boolean', 'description': 'Pago mínimo requerido', 'default': False},
+                    'pagoTotal': {'type': 'boolean', 'description': 'Pago total realizado', 'default': False},
+                    'programaPuntos': {'type': 'boolean', 'description': 'Programa de puntos asociado a la tarjeta', 'default': False}
+                }
+            }
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Información de la tarjeta procesada correctamente',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'data': {'$ref': '#/definitions/TarjetaInfo'}
+                }
+            }
+        },
+        '400': {
+            'description': 'Datos de entrada inválidos o faltantes',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'}
+                }
+            }
+        },
+        '404': {
+            'description': 'No se encontró al cliente con el ID proporcionado',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'}
+                }
+            }
+        }
+    }
+})
 def tarjeta():
     data = request.get_json()
     id_cliente = data.get('idCliente')
@@ -110,22 +200,22 @@ def tarjeta():
     }
     
     if fecha_emision:
-        cards_dict['data']['fechaEmision'] = cards.fecha_emision
+        cards_dict['data']['fecha_emision'] = cards.fecha_emision
     if fecha_vencimiento:
-        cards_dict['data']['fechaVencimiento'] = cards.fecha_vencimiento
+        cards_dict['data']['fecha_vencimiento'] = cards.fecha_vencimiento
     if fecha_corte:
-        cards_dict['data']['fechaCorte'] = cards.fecha_corte
+        cards_dict['data']['fecha_corte'] = cards.fecha_corte
     if cupo_total:
-        cards_dict['data']['cupoTotal'] = cards.cupo_total
+        cards_dict['data']['cupo_total'] = cards.cupo_total
     if tasa_interes:
-        cards_dict['data']['tasaInteres'] = cards.tasa_interes
+        cards_dict['data']['tasa_interes'] = cards.tasa_interes
     if estado_tarjeta:
-        cards_dict['data']['estado'] = cards.estado_tarjeta
+        cards_dict['data']['estado_tarjeta'] = cards.estado_tarjeta
     if pago_minimo:
-        cards_dict['data']['pagoMinimo'] = cards.pago_minimo
+        cards_dict['data']['pago_minimo'] = cards.pago_minimo
     if pago_total:
-        cards_dict['data']['pagoTotal'] = cards.pago_total
+        cards_dict['data']['pago_total'] = cards.pago_total
     if programa_puntos:
-        cards_dict['data']['programaPuntos'] = cards.programa_puntos
+        cards_dict['data']['programa_puntos'] = cards.programa_puntos
     
     return jsonify(cards_dict), 200

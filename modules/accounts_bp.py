@@ -8,8 +8,91 @@ from ..models import User, Accounts, Account_type
 
 accounts_bp = Blueprint('accounts_bp', __name__)
 
-# Consulta de creditos por id de persona
+# Consulta de cuentas por id de persona
 @accounts_bp.route('/api/cuenta', methods=['POST'])
+@swag_from({
+    'description': 'Consulta los creditos de una persona por su id',
+    'tags': ['Cuentas'],
+    'consumes': ['application/json'],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'idCliente': {'type': 'string'},
+                    'saldoActual': {'type': 'boolean', 'default': False},
+                    'fechaApertura': {'type': 'boolean', 'default': False},
+                    'fechaCierre': {'type': 'boolean', 'default': False},
+                    'beneficios': {'type': 'boolean', 'default': False},
+                    'estado': {'type': 'boolean', 'default': False}
+                }
+            }
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Credit found',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'message': {'type': 'string'},
+                            'success': {'type': 'boolean'},
+                            'data': {
+                                'type': 'object',
+                                'properties': {
+                                    'tipo_credito': {'type': 'string'},
+                                    'Persona': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'nombre': {'type': 'string'},
+                                            'apellido': {'type': 'string'}
+                                        }
+                                    },
+                                    'montoOriginal': {'type': 'number', 'description': 'Original amount of the credit'},
+                                    'fechaFinalizacion': {'type': 'string', 'description': 'End date of the credit'}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        '404': {
+            'description': 'Credit not found',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'message': {'type': 'string'},
+                            'success': {'type': 'boolean'}
+                        }
+                    }
+                }
+            }
+        },
+        '400': {
+            'description': 'No client ID provided',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'message': {'type': 'string'},
+                            'success': {'type': 'boolean'}
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
+
 def cuenta():
     data = request.get_json()
     id_cliente = data.get('idCliente')
@@ -63,20 +146,50 @@ def cuenta():
     }
     
     if saldo_actual:
-        account_dict['data']['saldoActual'] = accounts.saldo_actual
+        account_dict['data']['saldo_actual'] = accounts.saldo_actual
     if fecha_apertura:
-        account_dict['data']['fechaApertura'] = accounts.fecha_apertura
+        account_dict['data']['fecha_apertura'] = accounts.fecha_apertura
     if fecha_cierre:
-        account_dict['data']['fechaCierre'] = accounts.fecha_cierre
+        account_dict['data']['fecha_cierre'] = accounts.fecha_cierre
     if beneficios:
         account_dict['data']['beneficios'] = accounts.beneficios
     if estado:
-        account_dict['data']['estado'] = accounts.estado_cuenta
+        account_dict['data']['estado_cuenta'] = accounts.estado_cuenta
     
     return jsonify(account_dict), 200
 
 
 @accounts_bp.route('/api/cuenta/questions')
+@swag_from({
+    'description': 'Devuelve preguntas estándar para obtener información detallada de las cuentas',
+    'tags': ['Cuentas'],
+    'responses': {
+        '200': {
+            'description': 'Preguntas encontradas exitosamente',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'success': {'type': 'boolean'},
+                            'message': {'type': 'string'},
+                            'data': {
+                                'type': 'array',
+                                'items': {
+                                    'type': 'object',
+                                    'properties': {
+                                        'label': {'type': 'string'},
+                                        'name': {'type': 'string'}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 def questions():
     return jsonify(
      {
