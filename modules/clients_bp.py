@@ -4,8 +4,39 @@ from flask import Blueprint, jsonify, request
 from .. import db
 from flasgger import swag_from
 from ..models import User
+import hashlib
+from flask_login import login_user, login_required, logout_user
+from sqlalchemy.orm.exc import NoResultFound
 
 clients_bp = Blueprint('clients_bp', __name__)
+
+@clients_bp.route('/login', methods=['POST'])
+def login_post():
+    # Se leen los datos del formulario de inicio de sesión
+    data = request.get_json()
+
+    id = data.get('id')
+    password = data.get('password')
+
+    # Se busca al usuario en la BD y se calcula el hash de la clave introducida
+    user = db.session.execute(db.select(User).where(User.documento_identidad == id)).scalars().first()
+    encoded_pass_in = password.encode('UTF-8')
+    hash_pass_in = hashlib.sha256(encoded_pass_in).hexdigest()
+
+    # Si el usuario no existe o los hash no coinciden se notifica en un mensaje
+    if not user or not (user.contrasena == hash_pass_in):
+        # Response in json with code status 200
+        return jsonify({'success': False, 'message': 'Credenciales inválidas. Verifica e intenta de nuevo.'}), 200
+
+    # Devolver una respuesta JSON indicando éxito
+    return jsonify({
+        'message': 'Credenciales validas, bienvenido',
+        'success': True,
+        'nombre': user.nombre,
+        'apellido': user.apellido,
+        'documento_identidad': user.documento_identidad,
+    }), 200
+
 
 # Consulta clientes por ID
 @clients_bp.route('/client/<id>')

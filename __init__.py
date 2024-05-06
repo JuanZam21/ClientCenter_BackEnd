@@ -68,4 +68,5 @@ def create_app():
     from .modules.transactions_bp import transactions_bp as transactions_blueprint
     app.register_blueprint(transactions_blueprint)
 
+
     return app

@@ -196,7 +196,7 @@ def creditos_persona():
     credit_dict['Persona'] = {
         'nombre':   user_name,
         'apellido': user_last_name
-    }
+    }   
     if monto_original:
         credit_dict['monto_original'] = credito.monto_original
     if saldo_pendiente:

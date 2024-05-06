@@ -17,6 +17,8 @@ class User(db.Model):
     direccion = db.Column(db.String(100))
     correo_electronico = db.Column(db.String(50))
     telefono = db.Column(db.String(20))
+    contrasena = db.Column(db.String(100))
+
 
 class Sucursales(db.Model):
     __tablename__ = 'Sucursales'
