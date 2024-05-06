@@ -11,6 +11,85 @@ from sqlalchemy.orm.exc import NoResultFound
 clients_bp = Blueprint('clients_bp', __name__)
 
 @clients_bp.route('/login', methods=['POST'])
+@swag_from({
+    'tags': ['Autenticación'],
+    'description': 'Inicia sesión con un ID de usuario y una contraseña.',
+    'parameters': [
+        {
+            'in': 'body',
+            'name': 'body',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'id': {
+                        'type': 'string',
+                        'description': 'El ID del usuario.'
+                    },
+                    'password': {
+                        'type': 'string',
+                        'description': 'La contraseña del usuario.'
+                    }
+                },
+                'required': ['id', 'password']
+            },
+            'description': 'JSON con el ID y la contraseña del usuario.'
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'Inicio de sesión exitoso',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'message': {
+                                'type': 'string',
+                                'description': 'El mensaje de estado.'
+                            },
+                            'success': {
+                                'type': 'boolean',
+                                'description': 'El estado de éxito.'
+                            },
+                            'nombre': {
+                                'type': 'string',
+                                'description': 'El nombre del usuario.'
+                            },
+                            'apellido': {
+                                'type': 'string',
+                                'description': 'El apellido del usuario.'
+                            },
+                            'documento_identidad': {
+                                'type': 'string',
+                                'description': 'El documento de identidad del usuario.'
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        '400': {
+            'description': 'Solicitud incorrecta',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'message': {
+                                'type': 'string',
+                                'description': 'El mensaje de estado.'
+                            },
+                            'success': {
+                                'type': 'boolean',
+                                'description': 'El estado de éxito.'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 def login_post():
     # Se leen los datos del formulario de inicio de sesión
     data = request.get_json()
