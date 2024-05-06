@@ -12,7 +12,7 @@ clients_bp = Blueprint('clients_bp', __name__)
 
 @clients_bp.route('/login', methods=['POST'])
 @swag_from({
-    'tags': ['Autenticación'],
+    'tags': ['Empleados'],
     'description': 'Inicia sesión con un ID de usuario y una contraseña.',
     'parameters': [
         {
@@ -111,9 +111,12 @@ def login_post():
     return jsonify({
         'message': 'Credenciales validas, bienvenido',
         'success': True,
+        'data': {
+        'id': user.id,
         'nombre': user.nombre,
         'apellido': user.apellido,
         'documento_identidad': user.documento_identidad,
+    }
     }), 200
 
 
