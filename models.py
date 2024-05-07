@@ -1,10 +1,5 @@
-from flask_login import UserMixin
-from sqlalchemy.dialects.postgresql import JSON
-import datetime
-import uuid
 from . import db
 from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TIMESTAMP, TEXT
-from sqlalchemy.orm import relationship
 
 class User(db.Model):
     __tablename__ = 'Persona'

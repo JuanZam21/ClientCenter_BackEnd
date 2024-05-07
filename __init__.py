@@ -45,8 +45,8 @@ def create_app():
     db.init_app(app)
 
     # Blueprint para clients
-    from .modules.clients_bp import clients_bp as clients_blueprint
-    app.register_blueprint(clients_blueprint, url_prefix='/api/auth/')
+    from .modules.users_bp import users_bp as users_blueprint
+    app.register_blueprint(users_blueprint, url_prefix='/api/auth/')
 
     # Blueprint para credits 
     from .modules.credits_bp import credits_bp as credits_blueprint

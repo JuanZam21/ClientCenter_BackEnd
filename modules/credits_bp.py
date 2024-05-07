@@ -1,4 +1,3 @@
-import json
 from sqlalchemy.orm.exc import NoResultFound
 from collections import defaultdict
 from .. import db

@@ -1,16 +1,12 @@
-import json
-from sqlalchemy.orm.exc import NoResultFound
 from flask import Blueprint, jsonify, request
 from .. import db
 from flasgger import swag_from
 from ..models import User
 import hashlib
-from flask_login import login_user, login_required, logout_user
-from sqlalchemy.orm.exc import NoResultFound
 
-clients_bp = Blueprint('clients_bp', __name__)
+users_bp = Blueprint('users_bp', __name__)
 
-@clients_bp.route('/login', methods=['POST'])
+@users_bp.route('/login', methods=['POST'])
 @swag_from({
     'tags': ['Empleados'],
     'description': 'Inicia sesión con un ID de usuario y una contraseña.',
@@ -121,7 +117,7 @@ def login_post():
 
 
 # Consulta clientes por ID
-@clients_bp.route('/client/<id>')
+@users_bp.route('/client/<id>')
 @swag_from({
     'tags': ['Clientes'],  
     'description': 'Devuelve un cliente por su ID.',
