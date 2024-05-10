@@ -1,5 +1,19 @@
+import datetime
 from . import db
 from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TIMESTAMP, TEXT
+
+class History(db.Model):
+    __tablename__ = 'Historial_Atencion_Cliente'
+
+    id_atencion = Column(Integer, primary_key=True)
+    id_cliente = Column(Integer, ForeignKey('Persona.id'))
+    id_empleado = Column(Integer, ForeignKey('Persona.id'))
+    fecha_atencion = Column(TIMESTAMP, default=datetime.date.today)
+    tipo_atencion = Column(String(50))
+    descripcion = Column(TEXT)
+    categoria = Column(TEXT)
+    estado = Column(TEXT)
+    duracion_llamada = Column(Integer)
 
 class User(db.Model):
     __tablename__ = 'Persona'
@@ -104,25 +118,3 @@ class Transaction_type(db.Model):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
-
-"""
-class Empleados(Base):
-    __tablename__ = 'empleados'
-    id_empleado = Column(Integer, primary_key=True)
-    id_persona = Column(Integer, ForeignKey('personas.id_persona'))
-    puesto = Column(String(50))
-    persona = relationship('Personas')
-
-class HistorialAtencionCliente(Base):
-    __tablename__ = 'historial_atencion_cliente'
-    id_atencion = Column(Integer, primary_key=True)
-    id_cliente = Column(Integer, ForeignKey('clientes.id_cliente'))
-    id_empleado = Column(Integer, ForeignKey('empleados.id_empleado'))
-    fecha_atencion = Column(TIMESTAMP)
-    tipo_atencion = Column(String(50))
-    descripcion = Column(TEXT)
-    cliente = relationship('Clientes')
-    empleado = relationship('Empleados')
-
-
-"""

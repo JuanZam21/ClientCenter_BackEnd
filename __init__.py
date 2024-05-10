@@ -4,9 +4,19 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
 from flask_cors import CORS
+from sqlalchemy import Sequence
+from sqlalchemy.schema import CreateSequence
 
 # Inicializa SQLAlchemy para todo el proyecto
 db = SQLAlchemy()
+
+def initialize_database():
+    # Create sequence for id_atencion if it doesn't exist
+    if not db.engine.dialect.has_sequence(db.engine, 'id_atencion_seq'):
+        id_atencion_seq = Sequence('id_atencion_seq', start=80)
+        create_sequence = CreateSequence(id_atencion_seq)
+        db.session.execute(create_sequence)
+        db.session.commit()
 
 def create_app():
     app = Flask(__name__)
@@ -68,5 +78,8 @@ def create_app():
     from .modules.transactions_bp import transactions_bp as transactions_blueprint
     app.register_blueprint(transactions_blueprint)
 
+     # Blueprint para save history
+    #from .modules.save_history import save_history_bp as save_history_blueprint
+    #app.register_blueprint(save_history_blueprint)
 
     return app

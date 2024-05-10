@@ -3,6 +3,7 @@ from .. import db
 from flask import Blueprint, jsonify, request
 from collections import defaultdict
 from flasgger import swag_from
+from .save_history import save_history
 from ..models import User, Accounts, Account_type
 
 accounts_bp = Blueprint('accounts_bp', __name__)
@@ -216,5 +217,7 @@ def cuenta():
         account_dict['data']['beneficios'] = accounts.beneficios
     if estado:
         account_dict['data']['estado_cuenta'] = accounts.estado_cuenta
+
+    save_history(user_id, 3, 'cuentas', 'activo')
     
     return jsonify(account_dict), 200
