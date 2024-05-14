@@ -1,48 +1,51 @@
 import unittest
+from flask import Blueprint
 from unittest.mock import patch, MagicMock
-from ..modules.users_bp import login_post, client
-from .. import app
-from ..models import User
+from ...ClientCenter_BackEnd.models import User
+from ...ClientCenter_BackEnd.modules.users_bp import login_post, client
+from ...ClientCenter_BackEnd import create_app, db
 
 class TestLogin(unittest.TestCase):
 
-    def setUp(self):
-        # Configurar un cliente de prueba falso
-        self.client = app.test_client()
-        # Configurar el contexto de la aplicación
-        self.app_context = app.app_context()
-        self.app_context.push()
+    @classmethod
+    def setUpClass(cls):
+        # Initialize the app
+        cls.app = create_app()
+        cls.app.config['TESTING'] = True
+        cls.client = cls.app.test_client()
+        cls.app_context = cls.app.app_context()
+        cls.app_context.push()
 
-    def tearDown(self):
-        # Pop del contexto de la aplicación
-        self.app_context.pop()
+    @classmethod
+    def tearDownClass(cls):
+        cls.app_context.pop()
 
-    @patch('your_module.db')
-    @patch('your_module.hashlib')
+    @patch('ClientCenter_BackEnd.db')
+    @patch('ClientCenter_BackEnd.modules.users_bp.hashlib')
     def test_login_post_success(self, mock_hashlib, mock_db):
-        # Configurar datos de prueba
+        # Configure test data
         test_user = User(id=1, nombre='Test', apellido='User', documento_identidad='123456789')
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = test_user
         mock_hashlib.sha256.return_value.hexdigest.return_value = 'hashed_password'
 
-        # Simular una solicitud POST con datos válidos
+        # Simulate a POST request with valid data
         response = self.client.post('/login', json={'id': '1', 'password': 'password'})
 
-        # Verificar la respuesta
+        # Verify the response
         self.assertEqual(response.status_code, 200)
         data = response.json
         self.assertTrue(data['success'])
         self.assertEqual(data['message'], 'Credenciales validas, bienvenido')
 
-    @patch('your_module.db')
+    @patch('ClientCenter_BackEnd.db')
     def test_login_post_invalid_credentials(self, mock_db):
-        # Configurar datos de prueba para un usuario no existente
+        # Configure test data for a non-existent user
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = None
 
-        # Simular una solicitud POST con datos de inicio de sesión inválidos
+        # Simulate a POST request with invalid login data
         response = self.client.post('/login', json={'id': '1', 'password': 'password'})
 
-        # Verificar la respuesta
+        # Verify the response
         self.assertEqual(response.status_code, 200)
         data = response.json
         self.assertFalse(data['success'])
@@ -50,41 +53,43 @@ class TestLogin(unittest.TestCase):
 
 class TestClient(unittest.TestCase):
 
-    def setUp(self):
-        # Configurar un cliente de prueba falso
-        self.client = app.test_client()
-        # Configurar el contexto de la aplicación
-        self.app_context = app.app_context()
-        self.app_context.push()
+    @classmethod
+    def setUpClass(cls):
+        # Initialize the app
+        cls.app = create_app()
+        cls.app.config['TESTING'] = True
+        cls.client = cls.app.test_client()
+        cls.app_context = cls.app.app_context()
+        cls.app_context.push()
 
-    def tearDown(self):
-        # Pop del contexto de la aplicación
-        self.app_context.pop()
+    @classmethod
+    def tearDownClass(cls):
+        cls.app_context.pop()
 
-    @patch('your_module.db')
+    @patch('ClientCenter_BackEnd.db')
     def test_client_found(self, mock_db):
-        # Configurar datos de prueba para un cliente existente
+        # Configure test data for an existing client
         test_user = User(id=1, nombre='Test', apellido='User', documento_identidad='123456789')
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = test_user
 
-        # Simular una solicitud GET para un cliente existente
+        # Simulate a GET request for an existing client
         response = self.client.get('/client/1')
 
-        # Verificar la respuesta
+        # Verify the response
         self.assertEqual(response.status_code, 200)
         data = response.json
         self.assertTrue(data['success'])
         self.assertEqual(data['message'], 'Cliente encontrado')
 
-    @patch('your_module.db')
+    @patch('ClientCenter_BackEnd.db')
     def test_client_not_found(self, mock_db):
-        # Configurar datos de prueba para un cliente no existente
+        # Configure test data for a non-existent client
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = None
 
-        # Simular una solicitud GET para un cliente no existente
+        # Simulate a GET request for a non-existent client
         response = self.client.get('/client/1')
 
-        # Verificar la respuesta
+        # Verify the response
         self.assertEqual(response.status_code, 404)
         data = response.json
         self.assertFalse(data['success'])

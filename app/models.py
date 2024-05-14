@@ -2,19 +2,6 @@ import datetime
 from . import db
 from sqlalchemy import Column, Integer, String, Date, DECIMAL, ForeignKey, TIMESTAMP, TEXT
 
-class History(db.Model):
-    __tablename__ = 'Historial_Atencion_Cliente'
-
-    id_atencion = Column(Integer, primary_key=True)
-    id_cliente = Column(Integer, ForeignKey('Persona.id'))
-    id_empleado = Column(Integer, ForeignKey('Persona.id'))
-    fecha_atencion = Column(TIMESTAMP, default=datetime.date.today)
-    tipo_atencion = Column(String(50))
-    descripcion = Column(TEXT)
-    categoria = Column(TEXT)
-    estado = Column(TEXT)
-    duracion_llamada = Column(Integer)
-
 class User(db.Model):
     __tablename__ = 'Persona'
 
@@ -27,7 +14,6 @@ class User(db.Model):
     correo_electronico = db.Column(db.String(50))
     telefono = db.Column(db.String(20))
     contrasena = db.Column(db.String(100))
-
 
 class Sucursales(db.Model):
     __tablename__ = 'Sucursales'
@@ -118,3 +104,16 @@ class Transaction_type(db.Model):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
+
+class History(db.Model):
+    __tablename__ = 'Historial_Atencion_Cliente'
+
+    id_atencion = Column(Integer, primary_key=True)
+    id_cliente = Column(Integer, ForeignKey('Persona.id'))
+    id_empleado = Column(Integer, ForeignKey('Persona.id'))
+    fecha_atencion = Column(TIMESTAMP, default=datetime.date.today)
+    tipo_atencion = Column(String(50))
+    descripcion = Column(TEXT)
+    categoria = Column(TEXT)
+    estado = Column(TEXT)
+    duracion_llamada = Column(Integer)
