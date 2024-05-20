@@ -1,77 +1,60 @@
 import os
-from . import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
 from flask_cors import CORS
-from sqlalchemy import Sequence
-from sqlalchemy.schema import CreateSequence
+from . import config
 
-# Inicializa SQLAlchemy para todo el proyecto
+# Initialize SQLAlchemy
 db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
     CORS(app)
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     swagger = Swagger(app)
 
-    # Se determina el ambiente (Dev/Prod) y se cargan las variables de entorno
+    # Load the appropriate configuration based on environment variables
     if 'DBNAME_DEV' not in os.environ:
         app.config.from_object(config.config['production'])
-
-        # Se asignan las variables para las cadenas de conexión a la BD en Azure
-        database = app.config.get('IA_DB_NAME')
-        user = app.config.get('IA_DB_USER')
-        password = app.config.get('IA_DB_PASS')
-        host = app.config.get('IA_DB_HOST')
-        port = app.config.get('IA_DB_PORT')
-        
-        db_uri = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
-        
+        db_uri = get_database_uri(app)
     else:
         app.config.from_object(config.config['development'])
+        db_uri = get_database_uri(app)
 
-        # Se asignan las variables para la cadena de conexión a la BD local
-        database = app.config.get('DBNAME')
-        user = app.config.get('DBUSER')
-        password = app.config.get('DBPASS')
-        host = app.config.get('DBHOST')
-        port = app.config.get('DBPORT')
-        
-        db_uri = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
-
-    # Se crea la cadena de conexión a la BD y la clave de la aplicación
+    # Set the SQLAlchemy database URI
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
-    # Se inicializa la aplicación
+    # Initialize the database with the app
     db.init_app(app)
 
-    # Blueprint para clients
+    # Register blueprints
     from .modules.users_bp import users_bp as users_blueprint
-    app.register_blueprint(users_blueprint, url_prefix='/api/auth/')
+    app.register_blueprint(users_blueprint, url_prefix='/api/auth')
 
-    # Blueprint para credits 
+    # Add other blueprints as needed
     from .modules.credits_bp import credits_bp as credits_blueprint
     app.register_blueprint(credits_blueprint)
 
-    # Blueprint para accounts 
     from .modules.accounts_bp import accounts_bp as accounts_blueprint
     app.register_blueprint(accounts_blueprint)
 
-    # Blueprint para offices
     from .modules.offices_bp import offices_bp as offices_blueprint
     app.register_blueprint(offices_blueprint, url_prefix='/api')
-    
-    # Blueprint para cards
+
     from .modules.cards_bp import cards_bp as cards_blueprint
     app.register_blueprint(cards_blueprint)
 
-    # Blueprint para transactions 
     from .modules.transactions_bp import transactions_bp as transactions_blueprint
     app.register_blueprint(transactions_blueprint)
 
-    # Blueprint para test_user
-    #from .test.test_users import test_users as test_users_blueprint
-    #app.register_blueprint(test_users_blueprint)
-
     return app
+
+def get_database_uri(app):
+    database = app.config.get('DBNAME')
+    user = app.config.get('DBUSER')
+    password = app.config.get('DBPASS')
+    host = app.config.get('DBHOST')
+    port = app.config.get('DBPORT')
+    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"

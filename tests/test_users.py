@@ -1,15 +1,13 @@
-import unittest
-from flask import Blueprint
+import unittest, hashlib
 from unittest.mock import patch, MagicMock
-from ...ClientCenter_BackEnd.models import User
-from ...ClientCenter_BackEnd.modules.users_bp import login_post, client
-from ...ClientCenter_BackEnd import create_app, db
+from app.models import User
+from app import create_app, db
+
 
 class TestLogin(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Initialize the app
         cls.app = create_app()
         cls.app.config['TESTING'] = True
         cls.client = cls.app.test_client()
@@ -20,42 +18,43 @@ class TestLogin(unittest.TestCase):
     def tearDownClass(cls):
         cls.app_context.pop()
 
-    @patch('ClientCenter_BackEnd.db')
-    @patch('ClientCenter_BackEnd.modules.users_bp.hashlib')
-    def test_login_post_success(self, mock_hashlib, mock_db):
-        # Configure test data
-        test_user = User(id=1, nombre='Test', apellido='User', documento_identidad='123456789')
+     # Test a successful login
+    @patch('app.db')
+    def test_login_post_successful(self, mock_db):
+        hashed_password = hashlib.sha256('clave'.encode('UTF-8')).hexdigest()
+        test_user = User(id=3, nombre='Pedro', apellido='López', documento_identidad='345678901', contrasena=hashed_password)
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = test_user
-        mock_hashlib.sha256.return_value.hexdigest.return_value = 'hashed_password'
 
-        # Simulate a POST request with valid data
-        response = self.client.post('/login', json={'id': '1', 'password': 'password'})
+        response = self.client.post('/api/auth/login', json={'id': '345678901', 'password': 'clave'})
 
-        # Verify the response
         self.assertEqual(response.status_code, 200)
-        data = response.json
+        data = response.get_json()
         self.assertTrue(data['success'])
         self.assertEqual(data['message'], 'Credenciales validas, bienvenido')
+        self.assertEqual(data['data']['id'], test_user.id)
+        self.assertEqual(data['data']['nombre'], test_user.nombre)
+        self.assertEqual(data['data']['apellido'], test_user.apellido)
+        self.assertEqual(data['data']['documento_identidad'], test_user.documento_identidad)
 
-    @patch('ClientCenter_BackEnd.db')
-    def test_login_post_invalid_credentials(self, mock_db):
-        # Configure test data for a non-existent user
-        mock_db.session.execute.return_value.scalars.return_value.first.return_value = None
-
-        # Simulate a POST request with invalid login data
-        response = self.client.post('/login', json={'id': '1', 'password': 'password'})
-
-        # Verify the response
-        self.assertEqual(response.status_code, 200)
-        data = response.json
+    # Test a unsuccessful login
+    @patch('app.db')
+    def test_login_post_invalid_password(self, mock_db):
+        hashed_password = hashlib.sha256('clave'.encode('UTF-8')).hexdigest()
+        test_user = User(id=3, nombre='Pedro', apellido='López', documento_identidad='345678901', contrasena=hashed_password)
+        mock_db.session.execute.return_value.scalars.return_value.first.return_value = test_user
+        
+        response = self.client.post('/api/auth/login', json={'id': '123456789', 'password': 'clave'})
+        
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
         self.assertFalse(data['success'])
         self.assertEqual(data['message'], 'Credenciales inválidas. Verifica e intenta de nuevo.')
+
 
 class TestClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Initialize the app
         cls.app = create_app()
         cls.app.config['TESTING'] = True
         cls.client = cls.app.test_client()
@@ -66,32 +65,26 @@ class TestClient(unittest.TestCase):
     def tearDownClass(cls):
         cls.app_context.pop()
 
-    @patch('ClientCenter_BackEnd.db')
+    @patch('app.db')
     def test_client_found(self, mock_db):
-        # Configure test data for an existing client
         test_user = User(id=1, nombre='Test', apellido='User', documento_identidad='123456789')
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = test_user
 
-        # Simulate a GET request for an existing client
-        response = self.client.get('/client/1')
+        response = self.client.get('/api/auth/client/123456789')
 
-        # Verify the response
         self.assertEqual(response.status_code, 200)
-        data = response.json
+        data = response.get_json()
         self.assertTrue(data['success'])
         self.assertEqual(data['message'], 'Cliente encontrado')
 
-    @patch('ClientCenter_BackEnd.db')
+    @patch('app.db')
     def test_client_not_found(self, mock_db):
-        # Configure test data for a non-existent client
         mock_db.session.execute.return_value.scalars.return_value.first.return_value = None
 
-        # Simulate a GET request for a non-existent client
-        response = self.client.get('/client/1')
+        response = self.client.get('/api/auth/client/945456798')
 
-        # Verify the response
         self.assertEqual(response.status_code, 404)
-        data = response.json
+        data = response.get_json()
         self.assertFalse(data['success'])
         self.assertEqual(data['message'], 'Usuario no encontrado.')
 
