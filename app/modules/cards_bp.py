@@ -178,7 +178,7 @@ def tarjeta():
     except NoResultFound:
         return jsonify({
             'success': False,
-            'message': 'No se encontraron creditos para el cliente proporcionado'
+            'message': 'No se encontraron tarjetas para el cliente proporcionado'
         }), 404
     
     cards = cards[0]
