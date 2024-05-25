@@ -36,7 +36,6 @@ save_history_bp = Blueprint('save_history_bp', __name__)
         }
     },
     'tags': ['Call Duration'],
-    'summary': 'Calcula y guarda la duración de la última llamada',
     'description': 'Consulta el último registro de la tabla historial_atencion_cliente, calcula la duración de la llamada y actualiza el campo duración.'
 })
 def call_duration():
