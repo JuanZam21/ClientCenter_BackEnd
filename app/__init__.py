@@ -23,7 +23,7 @@ def create_app():
         app.config.from_object(config.config['development'])
         db_uri = get_database_uri(app)
 
-    # Set the SQLAlchemy database URI
+    # Configurar SQLAlchemy database URI
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
     # Initialize the database with the app
@@ -33,7 +33,7 @@ def create_app():
     from .modules.users_bp import users_bp as users_blueprint
     app.register_blueprint(users_blueprint, url_prefix='/api/auth')
 
-    # Add other blueprints as needed
+    # añadir otros blueprints como sea necesario
     from .modules.credits_bp import credits_bp as credits_blueprint
     app.register_blueprint(credits_blueprint)
 
@@ -48,6 +48,10 @@ def create_app():
 
     from .modules.transactions_bp import transactions_bp as transactions_blueprint
     app.register_blueprint(transactions_blueprint)
+
+    from .modules.save_history import save_history_bp as save_history_blueprint
+    app.register_blueprint(save_history_blueprint)
+
 
     return app
 

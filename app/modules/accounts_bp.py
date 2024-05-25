@@ -191,7 +191,6 @@ def cuenta():
     id_account = accounts.id_tipo_cuenta
     account_type = db.session.query(Account_type).filter(Account_type.id == id_account).first()
     
-
     account_dict = {
         'data': {
             'id_cuenta': accounts.id_cuenta,
