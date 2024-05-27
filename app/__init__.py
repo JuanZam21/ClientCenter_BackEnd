@@ -52,6 +52,8 @@ def create_app():
     from .modules.save_history import save_history_bp as save_history_blueprint
     app.register_blueprint(save_history_blueprint)
 
+    from .modules.graphs_bp import graphs_bp as graphs_blueprint
+    app.register_blueprint(graphs_blueprint)
 
     return app
 
