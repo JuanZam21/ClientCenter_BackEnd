@@ -3,6 +3,7 @@ from .. import db
 from flasgger import swag_from
 from ..models import User
 import hashlib
+from .save_history import save_history
 
 users_bp = Blueprint('users_bp', __name__)
 

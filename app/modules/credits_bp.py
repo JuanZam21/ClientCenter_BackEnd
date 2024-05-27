@@ -4,6 +4,7 @@ from .. import db
 from flask import Blueprint, jsonify, request
 from flasgger import swag_from
 from ..models import Credit, User
+from .save_history import save_history
 
 credits_bp = Blueprint('credits_bp', __name__)
 
@@ -166,6 +167,14 @@ def creditos_persona():
     fecha_inicio = data.get('fechaInicio')
     fecha_finalizacion = data.get('fechaFinalizacion')
     estado = data.get('estado')
+
+    # json history
+    client_id = data.get('idCliente')
+    employee_id = data.get('idEmpleado')
+    category = data.get('categoria')
+    date = data.get('fechAtencion')
+    type = data.get('tipoAtencion')
+    description = data.get('descripcion')
     
     if not id_cliente:
         return jsonify({
@@ -208,6 +217,8 @@ def creditos_persona():
         credit_dict['fecha_finalizacion'] = credito.fecha_finalizacion
     if estado:
         credit_dict['estado_credito'] = credito.estado_credito
+
+    save_history(client_id, employee_id, category, date, type, description)
     
     return jsonify({
         'success': True,

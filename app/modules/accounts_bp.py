@@ -163,6 +163,14 @@ def cuenta():
     fecha_cierre = data.get('fechaCierre')
     beneficios = data.get('beneficios')
     estado = data.get('estado')
+
+    # Json history
+    client_id = data.get('idCliente')
+    employee_id = data.get('idEmpleado')
+    category = data.get('categoria')
+    date = data.get('fechAtencion')
+    type = data.get('tipoAtencion')
+    description = data.get('descripcion')
     
     if not id_cliente:
         return jsonify({
@@ -217,6 +225,6 @@ def cuenta():
     if estado:
         account_dict['data']['estado_cuenta'] = accounts.estado_cuenta
 
-    save_history(user_id, 3, 'cuentas', 'activo')
-    
+    save_history(client_id, employee_id, category, date, type, description)
+ 
     return jsonify(account_dict), 200

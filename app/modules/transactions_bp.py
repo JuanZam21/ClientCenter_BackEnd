@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 from collections import defaultdict
 from flasgger import swag_from
 from ..models import User, Transactions, Transaction_type
+from .save_history import save_history
 
 transactions_bp = Blueprint('transactions_bp', __name__)
 
@@ -131,6 +132,14 @@ def transaccion():
     id_cliente = data.get('idCliente')
     monto = data.get('monto')
     fecha_transaccion = data.get('fechaTransaccion')
+
+    # json history
+    client_id = data.get('idCliente')
+    employee_id = data.get('idEmpleado')
+    category = data.get('categoria')
+    date = data.get('fechAtencion')
+    type = data.get('tipoAtencion')
+    description = data.get('descripcion')
     
     if not id_cliente:
         return jsonify({
@@ -175,5 +184,7 @@ def transaccion():
         transaction_dict['data']['monto'] = transaction.monto
     if fecha_transaccion:
         transaction_dict['data']['fecha_transaccion'] = transaction.fecha_transaccion
+
+    save_history(client_id, employee_id, category, date, type, description)
     
     return jsonify(transaction_dict), 200
