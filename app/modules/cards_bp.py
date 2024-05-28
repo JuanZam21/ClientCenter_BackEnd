@@ -149,7 +149,7 @@ def question():
 })
 def tarjeta():
     data = request.get_json()
-    id_cliente = data.get('idCliente')
+    doc_cliente = data.get('idCliente')
     fecha_emision = data.get('fechaEmision')
     fecha_vencimiento = data.get('fechaVencimiento')
     fecha_corte = data.get('fechaCorte')
@@ -167,6 +167,7 @@ def tarjeta():
     date = data.get('fechAtencion')
     type = data.get('tipoAtencion')
     description = data.get('descripcion')
+
     
     if not id_cliente:
         return jsonify({
@@ -176,9 +177,11 @@ def tarjeta():
     
     try:
         # Consulta la tabla User para encontrar el usuario con el id_cliente proporcionado
-        user = db.session.query(User).filter(User.documento_identidad == id_cliente).first()
+        user = db.session.query(User).filter(User.documento_identidad == doc_cliente).first()
         # Obtiene el user_id del objeto user
         user_id = user.id
+
+
         user_name = user.nombre
         user_last_name = user.apellido
         # Consulta la tabla Accounts para encontrar todos los datos asociados con el user_id
