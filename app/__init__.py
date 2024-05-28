@@ -10,7 +10,8 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "https://clientcenter-frontend.onrender.com/"}})
+    CORS(app)
+    #, resources={r"/*": {"origins": "https://clientcenter-frontend.onrender.com/"}})
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     swagger = Swagger(app)
