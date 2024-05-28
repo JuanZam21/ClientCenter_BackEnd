@@ -227,6 +227,6 @@ def tarjeta():
     if programa_puntos:
         cards_dict['data']['programa_puntos'] = cards.programa_puntos
 
-    save_history(client_id, employee_id, category, date, type, description)
+    #save_history(client_id, employee_id, category, date, type, description)
     
     return jsonify(cards_dict), 200
