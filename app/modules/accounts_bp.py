@@ -157,7 +157,7 @@ def questions():
 })
 def cuenta():
     data = request.get_json()
-    id_cliente = data.get('idCliente')
+    doc_cliente = data.get('idCliente')
     saldo_actual = data.get('saldoActual')
     fecha_apertura = data.get('fechaApertura')
     fecha_cierre = data.get('fechaCierre')
@@ -165,14 +165,13 @@ def cuenta():
     estado = data.get('estado')
 
     # Json history
-    client_id = data.get('idCliente')
-    employee_id = data.get('idEmpleado')
+    employee_doc = data.get('idEmpleado')
     category = data.get('categoria')
     date = data.get('fechAtencion')
     type = data.get('tipoAtencion')
     description = data.get('descripcion')
     
-    if not id_cliente:
+    if not doc_cliente:
         return jsonify({
             'success': False,
             'message': 'No se proporcionó el id del cliente'
@@ -180,13 +179,13 @@ def cuenta():
     
     try:
         # Consulta la tabla User para encontrar el usuario con el id_cliente proporcionado
-        user = db.session.query(User).filter(User.documento_identidad == id_cliente).first()
+        client = db.session.query(User).filter(User.documento_identidad == doc_cliente).first()
         # Obtiene el user_id del objeto user
-        user_id = user.id
-        user_name = user.nombre
-        user_last_name = user.apellido
-        # Consulta la tabla Accounts para encontrar todos los datos asociados con el user_id
-        accounts = db.session.query(Accounts).filter(Accounts.id_persona == user_id).all()
+        client_id = client.id
+        client_name = client.nombre
+        client_last_name = client.apellido
+        # Consulta la tabla Accounts para encontrar todos los datos asociados con el client_id
+        accounts = db.session.query(Accounts).filter(Accounts.id_persona == client_id).all()
 
     except NoResultFound:
         return jsonify({
@@ -203,8 +202,8 @@ def cuenta():
         'data': {
             'id_cuenta': accounts.id_cuenta,
             'Persona': {
-                'nombre':   user_name,
-                'apellido': user_last_name
+                'nombre':   client_name,
+                'apellido': client_last_name
             },
             'tipo_cuenta': {
                 'name': account_type.name
@@ -225,6 +224,10 @@ def cuenta():
     if estado:
         account_dict['data']['estado_cuenta'] = accounts.estado_cuenta
 
+    # Guardar en la tabla history
+    employee = db.session.query(User).filter(User.documento_identidad == doc_cliente).first()
+    employee_id = employee.id   
+    
     save_history(client_id, employee_id, category, date, type, description)
  
     return jsonify(account_dict), 200

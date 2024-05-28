@@ -160,7 +160,7 @@ def questions():
 })
 def creditos_persona():
     data = request.get_json()
-    id_cliente = data.get('idCliente')
+    doc_cliente = data.get('idCliente')
     monto_original = data.get('montoOriginal')
     saldo_pendiente = data.get('saldoPendiente')
     tasa_interes = data.get('tasaInteres')
@@ -169,14 +169,13 @@ def creditos_persona():
     estado = data.get('estado')
 
     # json history
-    client_id = data.get('idCliente')
-    employee_id = data.get('idEmpleado')
+    employee_doc = data.get('idEmpleado')
     category = data.get('categoria')
     date = data.get('fechAtencion')
     type = data.get('tipoAtencion')
     description = data.get('descripcion')
     
-    if not id_cliente:
+    if not doc_cliente:
         return jsonify({
             'success': False,
             'message': 'No se proporcionó el id del cliente'
@@ -184,13 +183,14 @@ def creditos_persona():
     
     try:
         # Consulta la tabla User para encontrar el usuario con el id_cliente proporcionado
-        user = db.session.query(User).filter(User.documento_identidad == id_cliente).first()
+        client = db.session.query(User).filter(User.documento_identidad == doc_cliente).first()
+
         # Obtiene el user_id del objeto user
-        user_id = user.id
-        user_name = user.nombre
-        user_last_name = user.apellido
+        client_id = client.id
+        client_name = client.nombre
+        client_last_name = client.apellido
         # Consulta la tabla Credit para encontrar todos los créditos asociados con el user_id
-        creditos = db.session.query(Credit).filter(Credit.id_persona == user_id).all()
+        creditos = db.session.query(Credit).filter(Credit.id_persona == client_id).all()
 
     except NoResultFound:
         return jsonify({
@@ -202,8 +202,8 @@ def creditos_persona():
     credit_dict = defaultdict()
     credit_dict['tipo_credito'] = credito.tipo_credito 
     credit_dict['Persona'] = {
-        'nombre':   user_name,
-        'apellido': user_last_name
+        'nombre':   client_name,
+        'apellido': client_last_name
     }   
     if monto_original:
         credit_dict['monto_original'] = credito.monto_original
@@ -217,6 +217,10 @@ def creditos_persona():
         credit_dict['fecha_finalizacion'] = credito.fecha_finalizacion
     if estado:
         credit_dict['estado_credito'] = credito.estado_credito
+
+    # Guardar en la tabla history
+    employee = db.session.query(User).filter(User.documento_identidad == employee_doc).first()
+    employee_id = employee.id
 
     save_history(client_id, employee_id, category, date, type, description)
     

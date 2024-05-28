@@ -161,31 +161,31 @@ def tarjeta():
     programa_puntos = data.get('programaPuntos')
 
     # Json history
-    client_id = data.get('idCliente')
-    employee_id = data.get('idEmpleado')
+    employee_doc = data.get('idEmpleado')
     category = data.get('categoria')
     date = data.get('fechAtencion')
     type = data.get('tipoAtencion')
     description = data.get('descripcion')
 
     
-    if not id_cliente:
+    if not doc_cliente:
         return jsonify({
             'success': False,
-            'message': 'No se proporcionó el id del cliente'
+            'message': 'No se proporcionó el docuemnto del cliente'
         }), 400
     
     try:
         # Consulta la tabla User para encontrar el usuario con el id_cliente proporcionado
-        user = db.session.query(User).filter(User.documento_identidad == doc_cliente).first()
+        client = db.session.query(User).filter(User.documento_identidad == doc_cliente).first()
+
         # Obtiene el user_id del objeto user
-        user_id = user.id
+        client_id = client.id
 
 
-        user_name = user.nombre
-        user_last_name = user.apellido
-        # Consulta la tabla Accounts para encontrar todos los datos asociados con el user_id
-        cards = db.session.query(Cards).filter(Cards.id_persona == user_id).all()
+        client_name = client.nombre
+        client_last_name = client.apellido
+        # Consulta la tabla Accounts para encontrar todos los datos asociados con el client_id
+        cards = db.session.query(Cards).filter(Cards.id_persona == client_id).all()
 
     except NoResultFound:
         return jsonify({
@@ -200,7 +200,7 @@ def tarjeta():
     
     cards_dict = {
         'data': {
-            "nombre_titular": f"{user_name} {user_last_name}",
+            "nombre_titular": f"{client_name} {client_last_name}",
             'Tipo_tarjeta': {
                 'name':   card_type.name,
              },
@@ -228,6 +228,10 @@ def tarjeta():
         cards_dict['data']['pago_total'] = cards.pago_total
     if programa_puntos:
         cards_dict['data']['programa_puntos'] = cards.programa_puntos
+
+    # Guardar en la tabla history
+    employee = db.session.query(User).filter(User.documento_identidad == employee_doc).first()
+    employee_id = employee.id
 
     save_history(client_id, employee_id, category, date, type, description)
     
