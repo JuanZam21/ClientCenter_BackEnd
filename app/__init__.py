@@ -10,7 +10,7 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    cors = CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     swagger = Swagger(app)
