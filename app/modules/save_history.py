@@ -100,7 +100,6 @@ def save_history(client_id, employee_id, category, date, type, description):
     # Consulta cuántos registros hay en la tabla History
     cantidad_registros = db.session.query(History).count()
 
-    history = History(id_atencion=cantidad_registros+1, id_cliente=client_id, id_empleado=employee_id, categoria=category, fecha_atencion=date, tipo_atencion=type, descripcion=description)
+    history = History(id_atencion=cantidad_registros+1, id_cliente=client_id, id_empleado=employee_id, categoria=category, fecha_atencion=date, tipo_atencion=type, descripcion=description, estado='activo')
     db.session.add(history)
     db.session.commit()
-    return jsonify({'message': 'Historial guardado exitosamente'}), 200

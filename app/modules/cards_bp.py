@@ -195,7 +195,6 @@ def tarjeta():
     id_account = Cards.id_tipo_tarjeta
     card_type = db.session.query(Card_type).filter(Card_type.id == id_account).first()
     
-
     cards_dict = {
         'data': {
             "nombre_titular": f"{user_name} {user_last_name}",
@@ -227,6 +226,6 @@ def tarjeta():
     if programa_puntos:
         cards_dict['data']['programa_puntos'] = cards.programa_puntos
 
-    #save_history(client_id, employee_id, category, date, type, description)
+    save_history(client_id, employee_id, category, date, type, description)
     
     return jsonify(cards_dict), 200
