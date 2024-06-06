@@ -117,3 +117,16 @@ class History(db.Model):
     categoria = Column(TEXT)
     estado = Column(TEXT)
     duracion_llamada = Column(Integer)
+
+class Role(db.Model):
+    __tablename__ = 'Rol'
+
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(50))
+
+class UserRole(db.Model):
+    __tablename__ = 'Persona_role'
+
+    id = Column(Integer, primary_key=True)
+    id_persona = Column(String(50))
+    id_rol = Column(String(50))

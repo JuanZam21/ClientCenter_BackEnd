@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request
 from .. import db
 from flasgger import swag_from
-from ..models import User
+from ..models import User, UserRole, Role
 import hashlib
-from .save_history import save_history
+from sqlalchemy import join
 
 users_bp = Blueprint('users_bp', __name__)
 
@@ -91,12 +91,19 @@ def login_post():
     data = request.get_json()
     id = data.get('id')
     password = data.get('password')
+            
     user = db.session.execute(db.select(User).where(User.documento_identidad == id)).scalars().first()
     encoded_pass_in = password.encode('UTF-8')
     hash_pass_in = hashlib.sha256(encoded_pass_in).hexdigest()
 
     if not user or not (user.contrasena == hash_pass_in):
         return jsonify({'success': False, 'message': 'Credenciales inválidas. Verifica e intenta de nuevo.'}), 404
+
+    user_role_join = join(User, UserRole, User.id == UserRole.user_id)
+    role_join = join(user_role_join, Role, UserRole.role_id == Role.id)
+    role_query = db.select(Role.nombre).select_from(role_join).where(User.id == user.id)
+    role = db.session.execute(role_query).scalars().first()
+
 
     return jsonify({
         'message': 'Credenciales validas, bienvenido',
@@ -106,6 +113,7 @@ def login_post():
             'nombre': user.nombre,
             'apellido': user.apellido,
             'documento_identidad': user.documento_identidad,
+            'rol': role  # Agrega el rol al diccionario
         }
     }), 200
 
